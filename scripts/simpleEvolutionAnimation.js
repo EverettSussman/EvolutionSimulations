@@ -1,5 +1,5 @@
 var animator = null;
-var rest = 100;
+var rest = 50;
 
 $(document).ready(function() {
 
@@ -16,7 +16,7 @@ $(document).ready(function() {
 	var maxChildren = 2;
 
 	// Size of individual organisms
-	var size = 10;
+	var size = 5;
 
 	// Generation value
 	var generation = 1;
@@ -29,7 +29,7 @@ $(document).ready(function() {
 	var numRows = Math.floor(animateScreenHeight / size);
 
 	// Will be user supplied
-	var numOrganisms = 10;
+	var numOrganisms = 400;
 
 	// Contains organism objects
 	var organismList = {};
@@ -66,7 +66,30 @@ $(document).ready(function() {
 		ctx.fillStyle = "black";
 		ctx.font = "20px Georgia";
 		var textStart = animateScreenWidth + 20;
-		ctx.fillText("Generation: " + generation, textStart, 50)
+		var gps = 1000 / rest;
+
+		ctx.fillText("DeathValue: " + deathVal, textStart, 40);
+		ctx.fillText("Initial Number of Cols: " + numOrganisms, textStart, 70);
+		ctx.fillText("Generations per Second: " + gps, textStart, 100)
+		ctx.fillText("Generation: " + generation, textStart, 130);
+
+		// Find number of individual colonies
+		var numColonies = 0;
+		var sizeLargestColony = 0;
+
+		for (var id in organismList) {
+			var numInColony = organismList[id].length;
+			if (organismList[id].length != 0) {
+				numColonies++;
+				if (numInColony > sizeLargestColony) {
+					sizeLargestColony = numInColony;
+				}
+			}
+		}
+		ctx.fillText("Colonies: " + numColonies, textStart, 160);
+
+		// Report the size of the largest colonies
+		ctx.fillText("Largest Colony: " + sizeLargestColony, textStart, 190);
 
 	}
 
