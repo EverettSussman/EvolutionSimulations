@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Evolution Models</title>
+  <!-- Style Sheets -->
+  <link rel="stylesheet" type="text/css" href="css/main.css">
+  <!-- Scripts -->
+  <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
+  <script type="text/javascript" src="scripts/utils.js"></script>
+  <script type="text/javascript" src="scripts/simpleEvolution.js"></script>
+  <script type="text/javascript" src="scripts/simpleEvolutionAnimation.js"></script>
+</head>
+<body>
+  <div class="head">
+    <h1>Evolution Simulations</h1>
+    <h2>An exploration into how different statistical distributions explain genetic success and mutation.</h3>
+
+    <!--  Main navigation bar 
+    <nav id="nav-menu">
+      <li class="nav-button">Sandbox</li>
+      <li class="nav-button">Preset</li>
+    </nav> -->
+
+  </div>
+  <div class="body">
+    <div class="introduction">
+      <h3>Description of Project</h3>
+      <p>This project is intended to be a light-hearted simulation of single-celled organisms evolving overtime.  We will start off with a simple situation, where organisms compete with one another based on a fitness measure for space, ultimately resulting in one family tree of organisms dominating over a territory.  Later examples will include different terrains, where only the most fit organisms will be able to expand their colonies into these regions.  All simulations will have controls so that the user can modify initial fitness measures, and even the probability distributions used for organism mutation rates and death rates.</p>
+    </div>
+
+    <div class="random evolution">
+      <h3>Simple Evolution</h3>
+      <p>The properties of this simulation are the following.  At each time step:</p>
+      <ol>
+        <li>An organism can die with a probability corresponding to a universal deathVal and individual fitness level.  The larger the deathVal, the less likely all organisms are to  die off.  The larger the fitness level, the less likely organisms are to die off.  Note that the fitness level depends on mutations within an organism (all organisms start with a user-specified deathVal and fitness). </li>
+        <li>Given an organism has not died, it can reproduce, generating a uniform number of child organisms (up to 3) with the same color (representing that cell being a same member of the family).  Note that the number of children depend on the number of neighboring cells.  In the event that two organisms of different families are next to one another, then the organisms may kill one another and take the place of the victim.</li>
+        <li>For each child, a genetic mutation may occur according to the parent's mutation rate.  Larger mutation rates correspond to more genetic mutations.</li>
+      </ol>
+      <canvas id="randomEvolutionCanvas" width=800 height=500></canvas>
+      <div class="buttonContainer">
+        <button type="button" id="start" class="animation-button">Start Animation</button>
+        <button type="button" id="end" class="animation-button">End Animation</button>
+        <button type="button" id="pause" class="animation-button">Pause Animation</button>
+        <button type="button" id="resume" class="animation-button">Resume Animation</button>
+        
+      </div>
+    </div>
+    
+  </div>
+  <div class="foot">
+    <p>Developed by Everett Sussman.  Access the code at this <a href="https://github.com/EverettSussman/EvolutionSimulations">Git Repo</a>.</p>
+  </div>
+</body>
+</html>
