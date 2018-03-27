@@ -30,6 +30,7 @@ class SimpleOrganism{
 		this.mutateRate = randomFloat(1, 0, 1);
 
 		this.deathVal = deathVal;
+		this.dead = false;
 
 		this.fitness = fitness;
 
@@ -40,7 +41,7 @@ class SimpleOrganism{
 
 	move(map) {
 		// Check if cell dies
-		if (this.deathBool()) {
+		if (this.deathBool(map)) {
 			map.removeCell(this);
 		} else {
 			// Get children locations (may be 0)
@@ -52,12 +53,17 @@ class SimpleOrganism{
 		}
 	}
 
-	deathBool() {
+	deathBool(map) {
 		// Use deathVal to find probability of 
 		// organism dying.  Note that we use 
 		// an exponential distribution.
-		var lambda = Math.log(this.fitness + Math.E - 1);
-		this.dead = exponentialSample(1, lambda) > this.deathVal;
+		// Check whether organism is fit to live in cell
+		if (map.world[this.yPos][this.xPos] > this.fitness) {
+			this.dead = true;
+		} else {
+			var lambda = Math.log(this.fitness + Math.E - 1);
+			this.dead = exponentialSample(1, lambda) > this.deathVal;
+		}
 		return this.dead;
 	}
 

@@ -10,6 +10,7 @@
   <script type="text/javascript" src="scripts/simpleEvolution.js"></script>
   <script type="text/javascript" src="scripts/simpleEvolutionAnimation.js"></script>
   <script type="text/javascript" src="scripts/geneticDriftAnimation.js"></script>
+  <script type="text/javascript" src="scripts/nonUniformAnimation.js"></script>
 </head>
 <body>
   <div class="head">
@@ -75,6 +76,26 @@
           <button type="button" id="driftEnd" class="animation-button">End Animation</button>
           <button type="button" id="driftPause" class="animation-button">Pause Animation</button>
           <button type="button" id="driftResume" class="animation-button">Resume Animation</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="nonUniformLayout">
+      <h3>Adapting to Different Environments</h3>
+      <p>The properties of this simulation are all identical to the above, with the exception that now our map has certain regions that require a sufficient fitness level for an organism to survive.</p>
+      <canvas id="nonUniformCanvas" width=800 height=500></canvas>
+      <div class="animationControls">
+        <div class="animateSpeed">
+          <p class="animateSpeedLabel">Speed of Animation</p>
+          <form>
+            <input id="nonUniformSpeed" type="range" name="speedInput" min="1" step="1" max="20" value="20" class="slider">
+          </form>
+        </div>
+        <div class="buttonContainer">
+          <button type="button" id="nonUniformStart" class="animation-button">Start Animation</button>
+          <button type="button" id="nonUniformEnd" class="animation-button">End Animation</button>
+          <button type="button" id="nonUniformPause" class="animation-button">Pause Animation</button>
+          <button type="button" id="nonUniformResume" class="animation-button">Resume Animation</button>
         </div>
       </div>
     </div>
