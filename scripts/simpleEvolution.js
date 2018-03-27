@@ -11,7 +11,7 @@ class SimpleOrganism{
 			b) function of genetic makeup
 			c) in event of tie, flip coin
 	*/
-	constructor(x, y, size, deathVal, fitness, colonyNum, id) {
+	constructor(x, y, size, deathVal, fitness, colonyNum, id, mutation) {
 		// Array of positions of location
 		// All organisms start with one position
 		this.x = x;
@@ -32,6 +32,10 @@ class SimpleOrganism{
 		this.deathVal = deathVal;
 
 		this.fitness = fitness;
+
+		// Determines whether to include genetic drift
+		// boolean
+		this.mutation = mutation;
 	}
 
 	move(map) {
@@ -95,10 +99,19 @@ class SimpleOrganism{
 	}
 
 	genNewChild(idVal, x, y) {
-		// No mutation implemented yet
-		var childCell = new SimpleOrganism(x * this.size, y * this.size, 
+		if (this.mutation) {
+			// try deviation of .01
+			var low = this.fitness - .01;
+			var high = this.fitness + .01;
+			var newFitness = randomFloat(1, low, high)[0];
+			var childCell = new SimpleOrganism(x * this.size, y * this.size, 
+								this.size, this.deathVal, newFitness, 
+								this.colonyNum, idVal, this.mutation);
+		} else {
+			var childCell = new SimpleOrganism(x * this.size, y * this.size, 
 								this.size, this.deathVal, this.fitness, 
-								this.colonyNum, idVal);
+								this.colonyNum, idVal, this.mutation);
+		}
 		childCell.color = this.color;
 		return childCell;
 	}
@@ -136,7 +149,7 @@ class SimpleOrganism{
 
 class Map{
 
-	constructor(ctx, numRows, numCols, numCells, size, deathVal, fitness, maxChildren, layout) {
+	constructor(ctx, numRows, numCols, numCells, size, deathVal, fitness, maxChildren, mutation, layout) {
 		this.ctx = ctx;
 
 		this.rows = numRows;
@@ -157,6 +170,8 @@ class Map{
 		// Stores locations of colonies on map for rendering
 		this.cellMap = new Array(numRows);
 		this.cells = {};
+
+		this.mutation = mutation;
 
 		for (var i = 0; i < numRows; i++) {
 				var row = new Array(numCols).fill(0);
@@ -183,7 +198,7 @@ class Map{
 			this.cellMap[y][x] = colNum;
 			var newCell = new SimpleOrganism(x * size , 
 										 y * size, size, deathVal, 
-										 fitness, colNum, this.idVal);
+										 fitness, colNum, this.idVal, this.mutation);
 			var initDict = {};
 			initDict[this.idVal] = newCell;
 			this.cells[colNum] = initDict;
@@ -206,7 +221,7 @@ class Map{
 		this.cellMap[cell.yPos][cell.xPos] = 0;
 		delete this.cells[cell.colonyNum][cell.id]
 		// Remove colony if no more survivors
-		if (Object.keys(this.cells[cell.colonyNum]).length == 0) {
+		if (jQuery.isEmptyObject(this.cells[cell.colonyNum])) {
 			delete this.cells[cell.colonyNum];
 		}
 	}
