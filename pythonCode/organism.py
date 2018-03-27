@@ -63,10 +63,11 @@ class Map():
 			newOrg = Organism(x, y, deathVal, fitness, iD)
 			self.organismsId[iD].append(newOrg)
 
-	def killCell(self, i, iD, x, y):
+	def killCell(self, i, iD, x, y, cell):
 		# dead
 		self.organismVals[y][x] = 0
 		del self.organismsId[iD][i]
+		del cell
 			
 	def birthCell(self, iD, cell):
 		neighborLocs = cell.getOpenNeighbors(self.organismVals)
@@ -88,7 +89,7 @@ class Map():
 				# coin toss
 				if np.random.binomial(1, .5) == 1:
 					otherId = otherCell.id
-					self.killCell(i, otherId, x, y)
+					self.killCell(i, otherId, x, y, otherCell)
 					self.organismVals[y][x] = iD
 					newChild = Organism(x, y, self.deathVal, cell.fitness, iD)
 					self.organismsId[iD].append(newChild)
@@ -102,7 +103,7 @@ class Map():
 		for iD in self.organismsId.keys():
 			for i, cell in enumerate(self.organismsId[iD]):
 				if cell.deathBool():
-					self.killCell(i, iD, cell.x, cell.y)
+					self.killCell(i, iD, cell.x, cell.y, cell)
 				else:
 					self.birthCell(iD, cell)
 

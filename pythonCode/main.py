@@ -8,9 +8,9 @@ def main():
 
 	numEpochs = 100
 
-	width = 10
-	height = 10
-	numOrgs = 4
+	width = 50
+	height = 50
+	numOrgs = 100
 	deathVal = 4
 	fitness = .2
 
@@ -28,7 +28,7 @@ def main():
 		world.nextMap()
 
 	# dump json
-	with open('../json/test.json', 'w') as fout:
+	with open('../json/testlarge.json', 'w') as fout:
 		json.dump(allMapInfo, fout)
 	print('Finished simulation.')
 

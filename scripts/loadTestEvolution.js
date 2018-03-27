@@ -1,6 +1,6 @@
 
 
-$.getJSON("https://everettsussman.github.io/EvolutionSimulations/json/test.json", function(data) {
+$.getJSON("https://everettsussman.github.io/EvolutionSimulations/json/testlarge.json", function(data) {
 	
 	// Unpack data 
 	var numEpochs = data['numEpochs'];

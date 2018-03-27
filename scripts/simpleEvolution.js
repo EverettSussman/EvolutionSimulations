@@ -11,7 +11,7 @@ class SimpleOrganism{
 			b) function of genetic makeup
 			c) in event of tie, flip coin
 	*/
-	constructor(x, y, size, deathVal, fitness, id) {
+	constructor(x, y, size, deathVal, fitness, colonyNum, id) {
 		// Array of positions of location
 		// All organisms start with one position
 		this.x = x;
@@ -20,7 +20,9 @@ class SimpleOrganism{
 		this.xPos = x / size;
 		this.yPos = y / size;
 
+		this.colonyNum = colonyNum;
 		this.id = id;
+
 		// Array of rgb colors //
 		this.color = randomColor();
 		// Number of unit blocks occupied
@@ -28,9 +30,22 @@ class SimpleOrganism{
 		this.mutateRate = randomFloat(1, 0, 1);
 
 		this.deathVal = deathVal;
-		this.dead = false;
 
 		this.fitness = fitness;
+	}
+
+	move(map) {
+		// Check if cell dies
+		if (this.deathBool()) {
+			map.removeCell(this);
+		} else {
+			// Get children locations (may be 0)
+			var childrenLocs = this.getChildrenLocs(map); // Implement
+			
+			for (var i = 0; i < childrenLocs.length; i++) {
+				this.placeBirthChild(childrenLocs[i], map);
+			}
+		}
 	}
 
 	deathBool() {
@@ -42,61 +57,72 @@ class SimpleOrganism{
 		return this.dead;
 	}
 
-	getNeighbors(map) {
+	getChildrenLocs(map) {
+		// Returns the locations for the children of a cell
+		var poss = this.getFeasibleNeighbors(map.cellMap);
+		var maxFree = Math.min(map.maxChildren, poss.length);
+		if (maxFree > 0) {
+			var numChildren = binomialSample(1, maxFree, this.fitness)[0];
+		} else {
+			var numChildren = 0;
+		}
+		return shuffleArray(poss).slice(0, numChildren);
+	}
+
+	getNeighbors(cellMap) {
 		var neighbors = [];
 
-		var maxWidth = map[0].length - 1;
-		var maxHeight = map.length - 1;
+		var maxWidth = cellMap[0].length - 1;
+		var maxHeight = cellMap.length - 1;
 
-		// Top Left Case
-		if (this.xPos == 0 && this.yPos == 0) {
-			neighbors.push([this.xPos + 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-		// Top Right Case
-		} else if (this.xPos == maxWidth && this.yPos == 0) {
-			neighbors.push([this.xPos - 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-		// Bottom Left Case
-		} else if (this.xPos == 0 && this.yPos == maxHeight) {
-			neighbors.push([this.xPos, this.yPos - 1]);
-			neighbors.push([this.xPos + 1, this.yPos]);
-		// Bottom Right Case
-		} else if (this.xPos == maxWidth && this.yPos == maxHeight) {
-			neighbors.push([this.xPos - 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos - 1]);
-		// Top edge Case
-		} else if (this.yPos == 0) {
-			neighbors.push([this.xPos + 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-			neighbors.push([this.xPos - 1, this.yPos]);
-		// Right edge Case
-		} else if (this.xPos == maxWidth) {
-			neighbors.push([this.xPos, this.yPos - 1]);
-			neighbors.push([this.xPos - 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-		// Left edge Case
-		} else if (this.xPos == 0) {
-			neighbors.push([this.xPos, this.yPos - 1]);
-			neighbors.push([this.xPos + 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-		// Bottom edge Case
-		} else if (this.yPos == maxHeight) {
-			neighbors.push([this.xPos + 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos - 1]);
-			neighbors.push([this.xPos - 1, this.yPos]);
-		} else {
-			neighbors.push([this.xPos + 1, this.yPos]);
-			neighbors.push([this.xPos, this.yPos - 1]);
-			neighbors.push([this.xPos, this.yPos + 1]);
-			neighbors.push([this.xPos - 1, this.yPos]);
+		for (var x2 = this.xPos - 1; x2 < this.xPos + 2; x2++) {
+			for (var y2 = this.yPos - 1; y2 < this.yPos + 2; y2++) {
+				if ((this.xPos != x2 || this.yPos != y2) 
+				&& (0 <= x2 && x2 <= maxWidth) 
+				&& (0 <= y2 && y2 <= maxHeight)
+				&& (Math.abs(x2 - this.xPos) + Math.abs(y2 - this.yPos) < 2)) {
+					neighbors.push([x2, y2])
+				}
+			}
 		}
 		return neighbors;
 	}
 
-	getFeasibleNeighbors(map) {
-		var neighbors = this.getNeighbors(map);
-		neighbors = neighbors.filter(n => map[n[1]][n[0]] != this.id);
+	getFeasibleNeighbors(cellMap) {
+		var neighbors = this.getNeighbors(cellMap);
+		neighbors = neighbors.filter(n => cellMap[n[1]][n[0]] != this.colonyNum);
 		return neighbors;
+	}
+
+	genNewChild(idVal, x, y) {
+		// No mutation implemented yet
+		var childCell = new SimpleOrganism(x * this.size, y * this.size, 
+								this.size, this.deathVal, this.fitness, 
+								this.colonyNum, idVal);
+		childCell.color = this.color;
+		return childCell;
+	}
+
+	placeBirthChild(loc, map) {
+		// handles birth of new cell
+		var x = loc[0];
+		var y = loc[1];
+
+		// Consider battles!
+		if (map.cellMap[y][x] == 0) {
+			// Not considering fitness of terrain
+			map.addCell(this.genNewChild(map.idVal, x, y));
+		} else {
+			var otherCell = map.getCellByLoc(loc);
+			// Determine probability of this cell winning
+			// by ratio this.fitness / sum fitness
+			var p = this.fitness / (this.fitness + otherCell.fitness);
+			if (bernoulliSample(1, p)[0] == 1) {
+					// kill off otherCell
+					map.removeCell(otherCell);
+					map.addCell(this.genNewChild(map.idVal, x, y));
+			}
+		}
 	}
 
 	draw(ctx) {
@@ -106,9 +132,118 @@ class SimpleOrganism{
 		ctx.fillRect(this.x, this.y, 
 			this.size, this.size);
 	}
+}
 
+class Map{
 
+	constructor(ctx, numRows, numCols, numCells, size, deathVal, fitness, maxChildren, layout) {
+		this.ctx = ctx;
 
+		this.rows = numRows;
+		this.cols = numCols;
+
+		this.size = size;
+		this.deathVal = deathVal;
+		this.fitness = fitness;
+		this.maxChildren = maxChildren;
+
+		this.numCells = numCells;
+
+		this.idVal = 0
+
+		// Stores fitness levels needed to be in location
+		this.world = new Array(numRows);
+
+		// Stores locations of colonies on map for rendering
+		this.cellMap = new Array(numRows);
+		this.cells = {};
+
+		for (var i = 0; i < numRows; i++) {
+				var row = new Array(numCols).fill(0);
+				this.world[i] = row;
+				this.cellMap[i] = row;
+		} 
+
+		if (layout === undefined) {
+			this.world = this.world;
+		} else {
+			this.world = layout;
+		}
+
+		// Find coordinates of all organisms
+		var xyPos = randomShuffle(numCells, 0, numCols * numRows); 
+		
+		// Default in cell map is 0, so cell colonyNums start with 1
+		for (var colNum = 1; colNum < numCells + 1; colNum ++) {
+			var xyVal = xyPos[colNum - 1];
+			var x = xyVal % numCols;
+			var y = Math.floor(xyVal / numCols);
+
+			// Update world and add organisms
+			this.cellMap[y][x] = colNum;
+			var newCell = new SimpleOrganism(x * size , 
+										 y * size, size, deathVal, 
+										 fitness, colNum, this.idVal);
+			var initDict = {};
+			initDict[this.idVal] = newCell;
+			this.cells[colNum] = initDict;
+			this.idVal += 1;
+		}
+	}
+
+	next() {
+		for (var col in this.cells) {
+			for (var id in this.cells[col]) {
+				var cell = this.cells[col][id];
+				cell.draw(this.ctx);
+				// Move cell
+				cell.move(this);
+			}
+		}
+	}
+
+	removeCell(cell) {
+		this.cellMap[cell.yPos][cell.xPos] = 0;
+		delete this.cells[cell.colonyNum][cell.id]
+		// Remove colony if no more survivors
+		if (Object.keys(this.cells[cell.colonyNum]).length == 0) {
+			delete this.cells[cell.colonyNum];
+		}
+	}
+
+	addCell(cell, loc) {
+		this.cells[cell.colonyNum][this.idVal] = cell;
+		this.idVal += 1;
+		this.cellMap[cell.yPos][cell.xPos] = cell.colonyNum;
+	}
+
+	getCellByLoc(loc) {
+		var x = loc[0];
+		var y = loc[1];
+		var colNum = this.cellMap[y][x];
+		var otherCell;
+		for (var id in this.cells[colNum]) {
+			if (this.cells[colNum][id].xPos == x && this.cells[colNum][id].yPos == y) {
+				otherCell = this.cells[colNum][id];
+			}
+		}
+		return otherCell;
+	}
+
+	getNumColonies() {
+		return Object.keys(this.cells).length;
+	}
+
+	getLargestColony() {
+		var largestCol = 0;
+		for (var col in this.cells) {
+			var colSize = Object.keys(this.cells[col]).length;
+			if (colSize > largestCol) {
+				largestCol = colSize;
+			}
+		}
+		return largestCol;
+	}
 }
 
 //----- Tests -----//

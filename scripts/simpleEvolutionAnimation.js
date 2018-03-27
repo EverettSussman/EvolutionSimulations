@@ -9,6 +9,7 @@ $(document).ready(function() {
 
 	// Used for initial probability of death and fitness
 	var deathVal = 4;
+	
 	// Fitness should be between 0 and 1
 	var fitness = .2;
 
@@ -31,35 +32,8 @@ $(document).ready(function() {
 	// Will be user supplied
 	var numOrganisms = 400;
 
-	// Contains organism objects
-	var organismList = {};
-
-	// Create initial map of organism locations
-	var environmentMap = [];
-
-	function initOrganisms() {
-		for (var i = 0; i < numRows; i++) {
-			var row = new Array(numCols).fill(0);
-			environmentMap[i] = row;
-		}
-
-		// Find coordinates of all organisms
-		xyPos = randomShuffle(numOrganisms, 0, numCols * numRows); 
-		
-		for (var el = 1; el < numOrganisms + 1; el ++) {
-			var xyVal = xyPos[el - 1];
-			var j = xyVal % numCols;
-			var i = Math.floor(xyVal / numCols);
-
-			// Update environmentMap and add organisms
-			var id = el;
-			environmentMap[i][j] = id;
-			newCell = new SimpleOrganism(j * size , 
-										 i * size, size, deathVal, 
-										 fitness, id);
-			organismList[id] = [newCell];
-		}
-	}
+	var map = new Map(ctx, numRows, numCols, numOrganisms, 
+					  size, deathVal, fitness, maxChildren);
 
 	// Draw all text describing animation
 	function drawText() {
@@ -74,18 +48,9 @@ $(document).ready(function() {
 		ctx.fillText("Generation: " + generation, textStart, 130);
 
 		// Find number of individual colonies
-		var numColonies = 0;
-		var sizeLargestColony = 0;
+		var numColonies = map.getNumColonies();
+		var sizeLargestColony = map.getLargestColony();
 
-		for (var id in organismList) {
-			var numInColony = organismList[id].length;
-			if (organismList[id].length != 0) {
-				numColonies++;
-				if (numInColony > sizeLargestColony) {
-					sizeLargestColony = numInColony;
-				}
-			}
-		}
 		ctx.fillText("Colonies: " + numColonies, textStart, 160);
 
 		// Report the size of the largest colonies
@@ -94,7 +59,8 @@ $(document).ready(function() {
 	}
 
 	// Draw everything
-	function draw() {
+	function animate() {
+
 
 		// Clear canvas
 		ctx.clearRect(0, 0, c.width, c.height);
@@ -105,73 +71,7 @@ $(document).ready(function() {
 		ctx.lineTo(animateScreenWidth, animateScreenHeight);
 		ctx.stroke();
 
-		// Update organisms
-		for (var id in organismList) {
-			organismList[id].forEach(function(cell) {
-				cell.draw(ctx);
-				// Check if cell dies
-				if (cell.deathBool()) {
-					// Update environment map
-					environmentMap[cell.yPos][cell.xPos] = 0;
-					// remove cell
-					organismList[id] = organismList[id].filter(deadCell => (deadCell.yPos != cell.yPos 
-													  || deadCell.xPos != cell.xPos));
-				} else {
-					// Reproduce NO MUTATION IMPLEMENTED YET
-					poss = cell.getFeasibleNeighbors(environmentMap);
-					maxFree = Math.min(maxChildren, poss.length);
-					if (maxFree > 0) {
-						var numChildren = binomialSample(1, maxFree, cell.fitness)[0];
-					} else {
-						var numChildren = 0;
-					}
-					
-					newChildrenLocs = shuffleArray(poss).slice(0, numChildren);
-					
-					for (var i=0; i < numChildren; i++) {
-						// Add new organisms to environment map with same id as parents
-						var x = newChildrenLocs[i][0];
-						var y = newChildrenLocs[i][1];
-
-						// Consider battles!
-						if (environmentMap[y][x] != 0) {
-							// Find other organism
-							otherId = environmentMap[y][x];
-							// Single out cell in that location
-							otherCell = organismList[otherId].filter(oc => 
-												(oc.yPos == y && oc.xPos == x))[0];
-							// Coin toss scenario
-							if (otherCell.fitness == cell.fitness) {
-								if (bernoulliSample(1, .5)[0] == 1) {
-									// kill off otherCell
-									environmentMap[otherCell.yPos][otherCell.xPos] = cell.id;
-									organismList[otherId] = organismList[otherId].filter(deadCell => (deadCell.yPos != otherCell.yPos 
-													  			|| deadCell.xPos != otherCell.xPos));
-									victoryCell = new SimpleOrganism(x * size, y * size, size,
-																	cell.deathVal, cell.fitness,
-																	cell.id);
-									victoryCell.color = cell.color;
-									organismList[id].push(victoryCell);
-								}
-							}
-
-						} else {
-							environmentMap[y][x] = cell.id;
-							// Create new organism with same size, deathval, fitness,
-							// as parent organism
-							newCell = new SimpleOrganism(x * size, y * size, size,
-														cell.deathVal, cell.fitness, 
-														cell.id);
-							// Make sure it has the same color!
-							newCell.color = cell.color;
-							// add to list
-							organismList[id].push(newCell);
-						}
-					}
-				}
-			});
-		}
-
+		map.next();
 		drawText();
 		generation += 1;
 	}
@@ -179,20 +79,18 @@ $(document).ready(function() {
 		// Control buttons
 
 	$("#start").click(function () {
-		console.log("Clicked!");
+		console.log("Clicked Start!");
 
-		initOrganisms();
+		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+					  size, deathVal, fitness, maxChildren);
 
 		if (animator == null) {
-			animator = window.setInterval(draw, rest);
+			animator = window.setInterval(animate, rest);
 		};	
 	});
 
 	$("#end").click(function () {
-		console.log("Clicked!");
-
-		organismList = {};
-		environmentMap = [];
+		console.log("Clicked End!");
 		generation = 1;
 
 		clearInterval(animator);
@@ -200,8 +98,8 @@ $(document).ready(function() {
 
 		ctx.clearRect(0,0, c.width, c.height);
 
-		initOrganisms();
-		
+		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+					  size, deathVal, fitness, maxChildren);
 	});
 
 	$('#pause').click(function () {
@@ -214,9 +112,7 @@ $(document).ready(function() {
 		console.log("Resume clicked!");
 
 		if (animator == null) {
-			animator = window.setInterval(draw, rest);
+			animator = window.setInterval(animate, rest);
 		};
 	});
-
-	
 });
