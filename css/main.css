@@ -21,11 +21,25 @@ p, li {
 	font-family: 'Georgia';
 }
 
+.animationControls {
+	width: 100%;
+	text-align: center;
+	display: inline-block;
+	position: relative;
+}
 .buttonContainer button {
 	display: inline-block;
 	text-align: center;
 	left: 20%;
 	right: 20%;
+}
+
+.animateSpeed {
+	position: relative;
+	display: inline-block;
+	text-align: center;
+	width: 40%;
+	height: 10%;
 }
 
 /* Navigation Menu */

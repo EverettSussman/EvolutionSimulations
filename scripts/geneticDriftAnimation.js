@@ -4,7 +4,7 @@ var rest = 50;
 $(document).ready(function() {
 
 	// Create canvas width 800 height 500
-	var c = document.getElementById("randomEvolutionCanvas");
+	var c = document.getElementById("geneticDriftCanvas");
 	var ctx = c.getContext("2d");
 
 	// Used for initial probability of death and fitness
@@ -17,7 +17,7 @@ $(document).ready(function() {
 	var maxChildren = 2;
 
 	// Size of individual organisms
-	var size = 5;
+	var size = 10;
 
 	// Generation value
 	var generation = 1;
@@ -30,10 +30,10 @@ $(document).ready(function() {
 	var numRows = Math.floor(animateScreenHeight / size);
 
 	// Will be user supplied
-	var numOrganisms = 200;
+	var numOrganisms = 20;
 
 	// Whether to mutate for genetic drift
-	var mutation = false;
+	var mutation = true;
 
 	var map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
@@ -83,8 +83,8 @@ $(document).ready(function() {
 	// Control buttons
 
 	// Determine speed of animation
-	$("#randomEvolutionSpeed").on("change", function () {
-		var sliderVal = $("#randomEvolutionSpeed").val();
+	$("#geneticDriftSpeed").on("change", function () {
+		var sliderVal = $("#geneticDriftSpeed").val();
 		rest = 1000 / sliderVal;
 		// update animator 
 		clearInterval(animator);
@@ -92,7 +92,7 @@ $(document).ready(function() {
 	});
 
 	// Start animation
-	$("#start").click(function () {
+	$("#driftStart").click(function () {
 		console.log("Clicked Start!");
 
 		var map = new Map(ctx, numRows, numCols, numOrganisms, 
@@ -104,7 +104,7 @@ $(document).ready(function() {
 	});
 
 	// End animation
-	$("#end").click(function () {
+	$("#driftEnd").click(function () {
 		console.log("Clicked End!");
 		generation = 1;
 
@@ -118,14 +118,14 @@ $(document).ready(function() {
 	});
 
 	// Pause animtion
-	$('#pause').click(function () {
+	$('#driftPause').click(function () {
 		console.log("Pause clicked!");
 		clearInterval(animator);
 		animator = null;
 	});
 
 	// Resume animation
-	$('#resume').click(function () {
+	$('#driftResume').click(function () {
 		console.log("Resume clicked!");
 
 		if (animator == null) {
