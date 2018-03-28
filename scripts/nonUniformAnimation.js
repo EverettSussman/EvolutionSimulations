@@ -105,7 +105,7 @@ $(document).ready(function() {
 	$("#nonUniformStart").click(function () {
 		console.log("Clicked Start!");
 
-		var numap = new Map(ctx, numRows, numCols, numOrganisms, 
+		numap = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation, layout);
 
 		if (animator == null) {
@@ -123,7 +123,7 @@ $(document).ready(function() {
 
 		ctx.clearRect(0,0, c.width, c.height);
 
-		var numap = new Map(ctx, numRows, numCols, numOrganisms, 
+		numap = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation, layout);
 	});
 

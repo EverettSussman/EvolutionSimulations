@@ -211,8 +211,6 @@ class Map{
 										 this.mutation);
 			var initDict = {};
 			initDict[this.idVal] = newCell;
-			console.log(this.idVal);
-			console.log(this.world[y][x]);
 			this.cells[colNum] = initDict;
 			this.idVal += 1;
 		}
