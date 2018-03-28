@@ -95,7 +95,7 @@ $(document).ready(function() {
 	$("#start").click(function () {
 		console.log("Clicked Start!");
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
 		console.log(map.world);
 
@@ -114,7 +114,7 @@ $(document).ready(function() {
 
 		ctx.clearRect(0,0, c.width, c.height);
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
 	});
 

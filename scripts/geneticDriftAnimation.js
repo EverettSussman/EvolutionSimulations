@@ -95,7 +95,7 @@ $(document).ready(function() {
 	$("#driftStart").click(function () {
 		console.log("Clicked Start!");
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
 
 		if (animator == null) {
@@ -113,11 +113,11 @@ $(document).ready(function() {
 
 		ctx.clearRect(0,0, c.width, c.height);
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
 	});
 
-	// Pause animtion
+	// Pause animation
 	$('#driftPause').click(function () {
 		console.log("Pause clicked!");
 		clearInterval(animator);
