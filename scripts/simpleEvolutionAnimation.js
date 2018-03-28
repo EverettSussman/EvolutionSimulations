@@ -97,6 +97,7 @@ $(document).ready(function() {
 
 		var map = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation);
+		console.log(map.world);
 
 		if (animator == null) {
 			animator = window.setInterval(animate, rest);

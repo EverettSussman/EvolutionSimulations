@@ -168,7 +168,8 @@ class Map{
 
 		this.numCells = numCells;
 
-		this.idVal = 0
+		this.idVal = 0;
+		
 
 		// Stores fitness levels needed to be in location
 		this.world = new Array(numRows);
@@ -181,13 +182,15 @@ class Map{
 
 		for (var i = 0; i < numRows; i++) {
 				var row = new Array(numCols).fill(0);
+				var row2 = new Array(numCols).fill(0);
 				this.world[i] = row;
-				this.cellMap[i] = row;
+				this.cellMap[i] = row2;
 		} 
 
 		if (layout === undefined) {
 			this.world = this.world;
 		} else {
+			console.log('hi');
 			this.world = layout;
 		}
 
@@ -204,9 +207,12 @@ class Map{
 			this.cellMap[y][x] = colNum;
 			var newCell = new SimpleOrganism(x * size , 
 										 y * size, size, deathVal, 
-										 fitness, colNum, this.idVal, this.mutation);
+										 fitness, colNum, this.idVal, 
+										 this.mutation);
 			var initDict = {};
 			initDict[this.idVal] = newCell;
+			console.log(this.idVal);
+			console.log(this.world[y][x]);
 			this.cells[colNum] = initDict;
 			this.idVal += 1;
 		}

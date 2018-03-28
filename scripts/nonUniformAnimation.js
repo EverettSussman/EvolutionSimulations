@@ -1,8 +1,6 @@
 var animator = null;
 var rest = 50;
 
-var layout;
-
 $(document).ready(function() {
 
 	// Create canvas width 800 height 500
@@ -38,7 +36,7 @@ $(document).ready(function() {
 	var mutation = true;
 
 	// build layout
-	layout = new Array(numRows);
+	var layout = new Array(numRows);
 	for (var i = 0; i < numRows; i++) {
 		// Ensure first region can support organisms
 		var fillVal = .1 + Math.floor(i / (numRows / 3)) * .15;
@@ -46,7 +44,7 @@ $(document).ready(function() {
 		layout[i] = row;
 	}
 
-	var map = new Map(ctx, numRows, numCols, numOrganisms, 
+	var numap = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, 
 					  mutation, layout);
 
@@ -63,8 +61,8 @@ $(document).ready(function() {
 		ctx.fillText("Generation: " + generation, textStart, 130);
 
 		// Find number of individual colonies
-		var numColonies = map.getNumColonies();
-		var sizeLargestColony = map.getLargestColony();
+		var numColonies = numap.getNumColonies();
+		var sizeLargestColony = numap.getLargestColony();
 
 		ctx.fillText("Colonies: " + numColonies, textStart, 160);
 
@@ -88,7 +86,7 @@ $(document).ready(function() {
 
 		drawBoard();
 		drawText();
-		map.next();
+		numap.next();
 		generation += 1;
 	}
 
@@ -107,7 +105,7 @@ $(document).ready(function() {
 	$("#nonUniformStart").click(function () {
 		console.log("Clicked Start!");
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		var numap = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation, layout);
 
 		if (animator == null) {
@@ -125,7 +123,7 @@ $(document).ready(function() {
 
 		ctx.clearRect(0,0, c.width, c.height);
 
-		var map = new Map(ctx, numRows, numCols, numOrganisms, 
+		var numap = new Map(ctx, numRows, numCols, numOrganisms, 
 					  size, deathVal, fitness, maxChildren, mutation, layout);
 	});
 
